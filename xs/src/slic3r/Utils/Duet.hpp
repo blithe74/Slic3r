@@ -23,7 +23,7 @@ public:
 	wxString get_test_ok_msg () const;
 	wxString get_test_failed_msg (wxString &msg) const;
 	// Send gcode file to duet, filename is expected to be in UTF-8
-	bool send_gcode(const std::string &filename) const;
+	bool send_gcode(const std::string &sourcepath, const std::string &remotepath, bool print) const;
 	bool has_auto_discovery() const;
 	bool can_test() const;
 private:

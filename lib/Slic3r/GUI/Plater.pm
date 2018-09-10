@@ -370,10 +370,10 @@ sub new {
         $self->export_gcode;
     });
     EVT_BUTTON($self, $self->{btn_print}, sub {
-        $self->{print_file} = $self->export_gcode(Wx::StandardPaths::Get->GetTempDir());
+        $self->{print_file} = $self->export_gcode(Wx::StandardPaths::Get->GetTempDir(), 0);
     });
     EVT_BUTTON($self, $self->{btn_send_gcode}, sub {
-        $self->{send_gcode_file} = $self->export_gcode(Wx::StandardPaths::Get->GetTempDir());
+        $self->export_gcode(Wx::StandardPaths::Get->GetTempDir(), 1);
     });
     EVT_BUTTON($self, $self->{btn_reslice}, \&reslice);
     EVT_BUTTON($self, $self->{btn_export_stl}, \&export_stl);
@@ -1440,7 +1440,7 @@ sub reslice {
 }
 
 sub export_gcode {
-    my ($self, $output_file) = @_;
+    my ($self, $output_file, $upload) = @_;
     
     return if !@{$self->{objects}};
     
@@ -1492,6 +1492,13 @@ sub export_gcode {
         wxTheApp->{app_config}->update_last_output_dir(dirname($path));
         $self->{export_gcode_output_file} = $path;
         $dlg->Destroy;
+    }
+
+    my $dialog = Slic3r::GUI::PrintHostSendDialog->new($self->{export_gcode_output_file});
+    if ($dialog->ShowModal == wxID_OK) {
+        $self->{send_gcode_file} = $self->{export_gcode_output_file};
+        $self->{send_gcode_target} = $dialog->remote_path;
+        $self->{send_gcode_print} = $dialog->print;
     }
     
     $self->statusbar->StartBusy;
@@ -1621,7 +1628,7 @@ sub on_export_completed {
     if ($send_gcode) {
         my $host = Slic3r::PrintHost::get_print_host($self->{config});
 
-        if ($host->send_gcode($self->{send_gcode_file})) {
+        if ($host->send_gcode($self->{send_gcode_file}, $self->{send_gcode_target}, $self->{send_gcode_print})) {
             $self->statusbar->SetStatusText(L("Upload to host finished."));
         } else {
             $self->statusbar->SetStatusText("");

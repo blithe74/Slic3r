@@ -1,5 +1,4 @@
 #include "Duet.hpp"
-#include "PrintHostSendDialog.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -9,17 +8,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <wx/frame.h>
-#include <wx/event.h>
 #include <wx/progdlg.h>
-#include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/textctrl.h>
-#include <wx/checkbox.h>
 
 #include "libslic3r/PrintConfig.hpp"
 #include "slic3r/GUI/GUI.hpp"
-#include "slic3r/GUI/MsgDialog.hpp"
 #include "Http.hpp"
 
 namespace fs = boost::filesystem;
@@ -54,20 +46,11 @@ wxString Duet::get_test_failed_msg (wxString &msg) const
 	return wxString::Format("%s: %s", _(L("Could not connect to Duet")), msg);
 }
 
-bool Duet::send_gcode(const std::string &filename) const
+bool Duet::send_gcode(const std::string &sourcepath, const std::string &remotepath, bool print) const
 {
 	enum { PROGRESS_RANGE = 1000 };
 
 	const auto errortitle = _(L("Error while uploading to the Duet"));
-	fs::path filepath(filename);
-
-	PrintHostSendDialog send_dialog(filepath.filename(), true);
-	if (send_dialog.ShowModal() != wxID_OK) { return false; }
-
-	const bool print = send_dialog.print(); 
-	const auto upload_filepath = send_dialog.filename();
-	const auto upload_filename = upload_filepath.filename();
-	const auto upload_parent_path = upload_filepath.parent_path();
 
 	wxProgressDialog progress_dialog(
 	 	_(L("Duet upload")),
@@ -84,16 +67,15 @@ bool Duet::send_gcode(const std::string &filename) const
 
 	bool res = true;
 
-	auto upload_cmd = get_upload_url(upload_filepath.string());
-	BOOST_LOG_TRIVIAL(info) << boost::format("Duet: Uploading file %1%, filename: %2%, path: %3%, print: %4%, command: %5%")
-		% filepath.string()
-		% upload_filename.string()
-		% upload_parent_path.string()
+	auto upload_cmd = get_upload_url(remotepath);
+	BOOST_LOG_TRIVIAL(info) << boost::format("Duet: Uploading file %1% as %2%, print: %4%, command: %5%")
+		% sourcepath
+		% remotepath
 		% print
 		% upload_cmd;
 
 	auto http = Http::post(std::move(upload_cmd));
-	http.set_post_body(filename)
+	http.set_post_body(sourcepath)
 		.on_complete([&](std::string body, unsigned status) {
 			BOOST_LOG_TRIVIAL(debug) << boost::format("Duet: File uploaded: HTTP %1%: %2%") % status % body;
 			progress_dialog.Update(PROGRESS_RANGE);
@@ -105,7 +87,7 @@ bool Duet::send_gcode(const std::string &filename) const
 				res = false;
 			} else if (print) {
 				wxString errormsg;
-				res = start_print(errormsg, upload_filepath.string());
+				res = start_print(errormsg, remotepath);
 				if (!res) {
 					GUI::show_error(&progress_dialog, std::move(errormsg));
 				}

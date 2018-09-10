@@ -240,6 +240,8 @@ PresetUpdater*              O_OBJECT_SLIC3R
 Ref<PresetUpdater>          O_OBJECT_SLIC3R_T
 
 PrintHost*                  O_OBJECT_SLIC3R
+PrintHostSendDialog*        O_OBJECT_SLIC3R
+Ref<PrintHostSendDialog>    O_OBJECT_SLIC3R_T
 
 Axis                  T_UV
 ExtrusionLoopRole     T_UV

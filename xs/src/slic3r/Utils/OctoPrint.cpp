@@ -1,11 +1,13 @@
 #include "OctoPrint.hpp"
-#include "PrintHostSendDialog.hpp"
 
 #include <algorithm>
 #include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <wx/progdlg.h>
+
 #include "libslic3r/PrintConfig.hpp"
+#include "slic3r/GUI/GUI.hpp"
 #include "Http.hpp"
 
 namespace fs = boost::filesystem;
@@ -57,18 +59,13 @@ wxString OctoPrint::get_test_failed_msg (wxString &msg) const
 						_(L("Could not connect to OctoPrint")), msg, _(L("Note: OctoPrint version at least 1.1.0 is required.")));
 }
 
-bool OctoPrint::send_gcode(const std::string &filename) const
+bool OctoPrint::send_gcode(const std::string &sourcepath, const std::string &remotepath, bool print) const
 {
 	enum { PROGRESS_RANGE = 1000 };
 
 	const auto errortitle = _(L("Error while uploading to the OctoPrint server"));
-	fs::path filepath(filename);
 
-	PrintHostSendDialog send_dialog(filepath.filename(), true);
-	if (send_dialog.ShowModal() != wxID_OK) { return false; }
-
-	const bool print = send_dialog.print();
-	const auto upload_filepath = send_dialog.filename();
+	const auto upload_filepath = fs::path(remotepath);
 	const auto upload_filename = upload_filepath.filename();
 	const auto upload_parent_path = upload_filepath.parent_path();
 
@@ -90,7 +87,7 @@ bool OctoPrint::send_gcode(const std::string &filename) const
 	auto url = make_url("api/files/local");
 
 	BOOST_LOG_TRIVIAL(info) << boost::format("Octoprint: Uploading file %1% at %2%, filename: %3%, path: %4%, print: %5%")
-		% filepath.string()
+		% sourcepath
 		% url
 		% upload_filename.string()
 		% upload_parent_path.string()
@@ -100,7 +97,7 @@ bool OctoPrint::send_gcode(const std::string &filename) const
 	set_auth(http);
 	http.form_add("print", print ? "true" : "false")
 		.form_add("path", upload_parent_path.string())
-		.form_add_file("file", filename, upload_filename.string())
+		.form_add_file("file", sourcepath, upload_filename.string())
 		.on_complete([&](std::string body, unsigned status) {
 			BOOST_LOG_TRIVIAL(debug) << boost::format("Octoprint: File uploaded: HTTP %1%: %2%") % status % body;
 			progress_dialog.Update(PROGRESS_RANGE);

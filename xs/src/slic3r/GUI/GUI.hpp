@@ -168,7 +168,8 @@ int combochecklist_get_flags(wxComboCtrl* comboCtrl);
 wxString	L_str(const std::string &str);
 // Return wxString from std::string in UTF8
 wxString	from_u8(const std::string &str);
-
+// Return std::string in UTF8 from wxString
+std::string	into_u8(const wxString &str);
 
 void add_frequently_changed_parameters(wxWindow* parent, wxBoxSizer* sizer, wxFlexGridSizer* preset_sizer);
 

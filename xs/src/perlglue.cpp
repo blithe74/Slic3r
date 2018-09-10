@@ -67,6 +67,7 @@ REGISTER_CLASS(PresetUpdater, "PresetUpdater");
 REGISTER_CLASS(AppController, "AppController");
 REGISTER_CLASS(PrintController, "PrintController");
 REGISTER_CLASS(PrintHost, "PrintHost");
+REGISTER_CLASS(PrintHostSendDialog, "GUI::PrintHostSendDialog");
 
 SV* ConfigBase__as_hash(ConfigBase* THIS)
 {

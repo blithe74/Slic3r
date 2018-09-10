@@ -213,6 +213,8 @@
 %typemap{PresetHints*};
 %typemap{Ref<PresetHints>}{simple};
 %typemap{TabIface*};
+%typemap{PrintHostSendDialog*};
+%typemap{Ref<PrintHostSendDialog>}{simple};
 
 %typemap{PrintRegionPtrs*};
 %typemap{PrintObjectPtrs*};

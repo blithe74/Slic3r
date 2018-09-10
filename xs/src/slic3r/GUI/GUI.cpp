@@ -793,6 +793,12 @@ wxString from_u8(const std::string &str)
 	return wxString::FromUTF8(str.c_str());
 }
 
+std::string into_u8(const wxString &str)
+{
+	auto buffer_utf8 = str.utf8_str();
+	return std::string(buffer_utf8.data());
+}
+
 
 void add_frequently_changed_parameters(wxWindow* parent, wxBoxSizer* sizer, wxFlexGridSizer* preset_sizer)
 {

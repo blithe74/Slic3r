@@ -8,10 +8,9 @@
 #include <wx/font.h>
 #include <wx/bitmap.h>
 
-#include "slic3r/Utils/Semver.hpp"
-
 class wxBoxSizer;
 class wxCheckBox;
+
 
 namespace Slic3r {
 

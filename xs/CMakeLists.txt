@@ -247,12 +247,12 @@ add_library(libslic3r_gui STATIC
     ${LIBDIR}/slic3r/GUI/UpdateDialogs.hpp
     ${LIBDIR}/slic3r/GUI/FirmwareDialog.cpp
     ${LIBDIR}/slic3r/GUI/FirmwareDialog.hpp
+    ${LIBDIR}/slic3r/GUI/PrintHostSendDialog.cpp
+    ${LIBDIR}/slic3r/GUI/PrintHostSendDialog.hpp
     ${LIBDIR}/slic3r/Utils/Http.cpp
     ${LIBDIR}/slic3r/Utils/Http.hpp
     ${LIBDIR}/slic3r/Utils/FixModelByWin10.cpp
     ${LIBDIR}/slic3r/Utils/FixModelByWin10.hpp
-    ${LIBDIR}/slic3r/Utils/PrintHostSendDialog.cpp
-    ${LIBDIR}/slic3r/Utils/PrintHostSendDialog.hpp
     ${LIBDIR}/slic3r/Utils/OctoPrint.cpp
     ${LIBDIR}/slic3r/Utils/OctoPrint.hpp
     ${LIBDIR}/slic3r/Utils/Duet.cpp
@@ -403,6 +403,7 @@ set(XS_XSP_FILES
     ${XSP_DIR}/GUI_3DScene.xsp
     ${XSP_DIR}/GUI_Preset.xsp
     ${XSP_DIR}/GUI_Tab.xsp
+    ${XSP_DIR}/GUI_PrintHostSendDialog.xsp
     ${XSP_DIR}/Layer.xsp
     ${XSP_DIR}/Line.xsp
     ${XSP_DIR}/Model.xsp
